@@ -1,0 +1,5 @@
+django>=5.2.3
+transformers>=4.37.2
+torch>=2.2.0
+vaderSentiment>=3.3.2
+numpy<2.0.0 
