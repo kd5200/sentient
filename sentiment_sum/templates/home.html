@@ -1,0 +1,19 @@
+<form method="POST">
+  {% csrf_token %}
+  <textarea
+    name="comments"
+    rows="10"
+    cols="80"
+    placeholder="Paste comments here, one per line"
+  ></textarea>
+  <br /><button type="submit">Analyze</button>
+</form>
+
+{% if sentiment_data %}
+<h2>Sentiment Breakdown:</h2>
+<ul>
+  <li>Positive: {{ sentiment_data.positive }}%</li>
+  <li>Neutral: {{ sentiment_data.neutral }}%</li>
+  <li>Negative: {{ sentiment_data.negative }}%</li>
+</ul>
+{% endif %}
