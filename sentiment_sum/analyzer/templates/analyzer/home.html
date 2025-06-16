@@ -23,6 +23,7 @@
         border: none;
         border-radius: 4px;
         cursor: pointer;
+        margin: 5px;
       }
       button:hover {
         background-color: #45a049;
@@ -33,21 +34,81 @@
         background-color: #f9f9f9;
         border-radius: 4px;
       }
+      .error {
+        color: #ff0000;
+        margin: 10px 0;
+        padding: 10px;
+        background-color: #ffe6e6;
+        border-radius: 4px;
+      }
+      .upload-section {
+        margin: 20px 0;
+        padding: 20px;
+        background-color: #f5f5f5;
+        border-radius: 4px;
+      }
+      .divider {
+        text-align: center;
+        margin: 20px 0;
+        position: relative;
+      }
+      .divider::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background-color: #ddd;
+      }
+      .divider span {
+        background-color: white;
+        padding: 0 10px;
+        position: relative;
+        color: #666;
+      }
     </style>
   </head>
   <body>
     <h1>Sentiment Analysis</h1>
-    <form method="POST">
-      {% csrf_token %}
-      <textarea
-        name="comments"
-        rows="10"
-        cols="80"
-        placeholder="Paste comments here, one per line"
-      ></textarea>
-      <br />
-      <button type="submit">Analyze</button>
-    </form>
+
+    {% if error %}
+    <div class="error">{{ error }}</div>
+    {% endif %}
+
+    <div class="upload-section">
+      <h2>Upload File</h2>
+      <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="file" name="file" accept=".txt,.csv" required />
+        <button type="submit">Analyze File</button>
+      </form>
+      <p>
+        <small
+          >Supported formats: .txt (one comment per line) or .csv (comments in
+          first column)</small
+        >
+      </p>
+    </div>
+
+    <div class="divider">
+      <span>OR</span>
+    </div>
+
+    <div>
+      <h2>Paste Comments</h2>
+      <form method="POST">
+        {% csrf_token %}
+        <textarea
+          name="comments"
+          rows="10"
+          cols="80"
+          placeholder="Paste comments here, one per line"
+        ></textarea>
+        <br />
+        <button type="submit">Analyze Text</button>
+      </form>
+    </div>
 
     {% if sentiment_data %}
     <div class="results">
