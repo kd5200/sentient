@@ -67,6 +67,165 @@
         position: relative;
         color: #666;
       }
+      .summary {
+        margin: 20px 0;
+        padding: 15px;
+        background-color: #e8f5e9;
+        border-radius: 4px;
+        border-left: 4px solid #4caf50;
+      }
+      .detailed-analysis {
+        margin-top: 20px;
+      }
+      .comment-card {
+        margin: 10px 0;
+        padding: 10px;
+        background-color: white;
+        border-radius: 4px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+      .sentiment-bar {
+        height: 20px;
+        background-color: #e0e0e0;
+        border-radius: 10px;
+        margin: 5px 0;
+        overflow: hidden;
+      }
+      .sentiment-fill {
+        height: 100%;
+        background-color: #4caf50;
+        transition: width 0.3s ease;
+      }
+      .sentiment-fill.negative {
+        background-color: #f44336;
+      }
+      .sentiment-fill.neutral {
+        background-color: #9e9e9e;
+      }
+      .analysis-stats {
+        background-color: #f8f9fa;
+        padding: 15px;
+        border-radius: 4px;
+        margin-bottom: 20px;
+      }
+
+      .distribution-bar {
+        display: flex;
+        height: 30px;
+        margin: 15px 0;
+        border-radius: 4px;
+        overflow: hidden;
+      }
+
+      .positive-bar,
+      .neutral-bar,
+      .negative-bar {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 12px;
+        padding: 0 5px;
+        transition: width 0.3s ease;
+      }
+
+      .positive-bar {
+        background-color: #4caf50;
+      }
+
+      .neutral-bar {
+        background-color: #9e9e9e;
+      }
+
+      .negative-bar {
+        background-color: #f44336;
+      }
+
+      .comment-card {
+        background-color: white;
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        padding: 15px;
+        margin: 10px 0;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+
+      .comment-text {
+        margin-bottom: 10px;
+        line-height: 1.4;
+      }
+
+      .sentiment-scores {
+        display: flex;
+        gap: 20px;
+      }
+
+      .score-item {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+
+      .label {
+        font-weight: bold;
+        color: #666;
+      }
+
+      .value {
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 0.9em;
+      }
+
+      .value.positive {
+        background-color: #e8f5e9;
+        color: #2e7d32;
+      }
+
+      .value.negative {
+        background-color: #ffebee;
+        color: #c62828;
+      }
+
+      .value.neutral {
+        background-color: #f5f5f5;
+        color: #616161;
+      }
+
+      .theme-analysis {
+        margin: 20px 0;
+        padding: 20px;
+        background-color: #f8f9fa;
+        border-radius: 4px;
+        border-left: 4px solid #2196f3;
+      }
+
+      .themes {
+        margin-bottom: 20px;
+      }
+
+      .themes ul {
+        list-style-type: none;
+        padding-left: 0;
+      }
+
+      .themes li {
+        padding: 8px 12px;
+        margin: 5px 0;
+        background-color: #e3f2fd;
+        border-radius: 4px;
+        color: #1565c0;
+      }
+
+      .explanation {
+        line-height: 1.6;
+        color: #333;
+      }
+
+      .explanation h4 {
+        color: #1565c0;
+        margin-bottom: 10px;
+      }
     </style>
   </head>
   <body>
@@ -113,11 +272,128 @@
     {% if sentiment_data %}
     <div class="results">
       <h2>Sentiment Breakdown:</h2>
+      <div class="sentiment-bar">
+        <div
+          class="sentiment-fill"
+          style="width: {{ sentiment_data.positive }}%"
+        ></div>
+      </div>
       <ul>
         <li>Positive: {{ sentiment_data.positive }}%</li>
         <li>Neutral: {{ sentiment_data.neutral }}%</li>
         <li>Negative: {{ sentiment_data.negative }}%</li>
       </ul>
+
+      {% if sentiment_data.summary %}
+      <div class="summary">
+        <h3>Key Points</h3>
+        <ul>
+          {% for point in sentiment_data.summary %}
+          <li>{{ point }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endif %} {% if sentiment_data.theme_analysis %}
+      <div class="theme-analysis">
+        <h3>Theme Analysis</h3>
+        <div class="themes">
+          <h4>Main Themes</h4>
+          <ul>
+            {% for theme in sentiment_data.theme_analysis.themes %}
+            <li>{{ theme }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+        <div class="explanation">
+          <h4>Sentiment Analysis Explanation</h4>
+          <p>{{ sentiment_data.theme_analysis.explanation }}</p>
+        </div>
+      </div>
+      {% endif %}
+
+      <div class="detailed-analysis">
+        <h3>Detailed Analysis</h3>
+        <div class="analysis-stats">
+          <h4>Overall Statistics</h4>
+          <ul>
+            <li>
+              Total Comments Analyzed:
+              <strong>{{ sentiment_data.detailed_sentiment|length }}</strong>
+            </li>
+            <li>
+              Average VADER Score:
+              <strong
+                >{{ sentiment_data.avg_vader_score|floatformat:2 }}</strong
+              >
+            </li>
+            <li>
+              DistilBERT Confidence:
+              <strong
+                >{{ sentiment_data.avg_distilbert_score|floatformat:2 }}</strong
+              >
+            </li>
+          </ul>
+        </div>
+
+        <div class="sentiment-distribution">
+          <h4>Sentiment Distribution</h4>
+          <div class="distribution-bar">
+            <div
+              class="positive-bar"
+              style="width: {{ sentiment_data.positive }}%"
+            >
+              Positive ({{ sentiment_data.positive }}%)
+            </div>
+            <div
+              class="neutral-bar"
+              style="width: {{ sentiment_data.neutral }}%"
+            >
+              Neutral ({{ sentiment_data.neutral }}%)
+            </div>
+            <div
+              class="negative-bar"
+              style="width: {{ sentiment_data.negative }}%"
+            >
+              Negative ({{ sentiment_data.negative }}%)
+            </div>
+          </div>
+        </div>
+
+        <div class="comment-analysis">
+          <h4>Comment-by-Comment Analysis</h4>
+          {% for item in sentiment_data.detailed_sentiment %}
+          <div class="comment-card">
+            <div class="comment-text">{{ item.text }}</div>
+            <div class="sentiment-scores">
+              <div class="score-item">
+                <span class="label">VADER Score:</span>
+                <span
+                  class="value {% if item.vader_score > 0.05 %}positive{% elif item.vader_score < -0.05 %}negative{% else %}neutral{% endif %}"
+                >
+                  {{ item.vader_score|floatformat:2 }}
+                </span>
+              </div>
+              <div class="score-item">
+                <span class="label">DistilBERT:</span>
+                <span
+                  class="value {% if item.distilbert_label == 'POSITIVE' %}positive{% else %}negative{% endif %}"
+                >
+                  {{ item.distilbert_label }} ({{
+                  item.distilbert_score|floatformat:2 }})
+                </span>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <div class="no-data">
+      <p>
+        No analysis data available. Please upload a file or enter comments to
+        analyze.
+      </p>
     </div>
     {% endif %}
   </body>
