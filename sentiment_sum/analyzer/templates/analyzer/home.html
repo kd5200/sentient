@@ -226,6 +226,135 @@
         color: #1565c0;
         margin-bottom: 10px;
       }
+
+      .sentiment-analysis {
+        background: #fff;
+        border-radius: 8px;
+        padding: 20px;
+        margin: 20px 0;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .sentiment-stats {
+        display: flex;
+        justify-content: space-around;
+        margin: 20px 0;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 6px;
+      }
+
+      .sentiment-stats p {
+        font-size: 1.1em;
+        font-weight: 500;
+        margin: 0;
+      }
+
+      .key-points {
+        margin: 20px 0;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 6px;
+      }
+
+      .key-points ul {
+        list-style-type: disc;
+        padding-left: 20px;
+      }
+
+      .theme-analysis {
+        margin: 20px 0;
+        padding: 20px;
+        background: #f8f9fa;
+        border-radius: 6px;
+      }
+
+      .themes ul {
+        list-style-type: none;
+        padding: 0;
+      }
+
+      .themes li {
+        padding: 8px 0;
+        border-bottom: 1px solid #eee;
+      }
+
+      .explanation {
+        margin-top: 20px;
+        padding: 15px;
+        background: #fff;
+        border-radius: 6px;
+        border: 1px solid #eee;
+      }
+
+      .detailed-analysis {
+        margin: 20px 0;
+        padding: 20px;
+        background: #f8f9fa;
+        border-radius: 6px;
+      }
+
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin: 15px 0;
+      }
+
+      .stats p {
+        margin: 0;
+        padding: 10px;
+        background: #fff;
+        border-radius: 4px;
+        text-align: center;
+      }
+
+      .distribution-bars {
+        margin: 20px 0;
+      }
+
+      .bar {
+        height: 30px;
+        margin: 5px 0;
+        padding: 5px 10px;
+        color: white;
+        border-radius: 4px;
+        transition: width 0.3s ease;
+      }
+
+      .bar.positive {
+        background: #28a745;
+      }
+
+      .bar.neutral {
+        background: #6c757d;
+      }
+
+      .bar.negative {
+        background: #dc3545;
+      }
+
+      h2,
+      h3,
+      h4 {
+        color: #333;
+        margin-bottom: 15px;
+      }
+
+      h2 {
+        font-size: 1.8em;
+        border-bottom: 2px solid #eee;
+        padding-bottom: 10px;
+      }
+
+      h3 {
+        font-size: 1.4em;
+      }
+
+      h4 {
+        font-size: 1.2em;
+        color: #666;
+      }
     </style>
   </head>
   <body>
@@ -271,120 +400,77 @@
 
     {% if sentiment_data %}
     <div class="results">
-      <h2>Sentiment Breakdown:</h2>
-      <div class="sentiment-bar">
-        <div
-          class="sentiment-fill"
-          style="width: {{ sentiment_data.positive }}%"
-        ></div>
-      </div>
-      <ul>
-        <li>Positive: {{ sentiment_data.positive }}%</li>
-        <li>Neutral: {{ sentiment_data.neutral }}%</li>
-        <li>Negative: {{ sentiment_data.negative }}%</li>
-      </ul>
+      <div class="sentiment-analysis">
+        <h2>Sentiment Breakdown:</h2>
+        <div class="sentiment-stats">
+          <p>Positive: {{ sentiment_data.positive }}%</p>
+          <p>Neutral: {{ sentiment_data.neutral }}%</p>
+          <p>Negative: {{ sentiment_data.negative }}%</p>
+        </div>
 
-      {% if sentiment_data.summary %}
-      <div class="summary">
-        <h3>Key Points</h3>
-        <ul>
-          {% for point in sentiment_data.summary %}
-          <li>{{ point }}</li>
-          {% endfor %}
-        </ul>
-      </div>
-      {% endif %} {% if sentiment_data.theme_analysis %}
-      <div class="theme-analysis">
-        <h3>Theme Analysis</h3>
-        <div class="themes">
-          <h4>Main Themes</h4>
+        {% if sentiment_data.summary %}
+        <div class="key-points">
+          <h3>Key Points</h3>
           <ul>
-            {% for theme in sentiment_data.theme_analysis.themes %}
-            <li>{{ theme }}</li>
+            {% for point in sentiment_data.summary %}
+            <li>{{ point }}</li>
             {% endfor %}
           </ul>
         </div>
-        <div class="explanation">
-          <h4>Sentiment Analysis Explanation</h4>
-          <p>{{ sentiment_data.theme_analysis.explanation }}</p>
-        </div>
-      </div>
-      {% endif %}
-
-      <div class="detailed-analysis">
-        <h3>Detailed Analysis</h3>
-        <div class="analysis-stats">
-          <h4>Overall Statistics</h4>
-          <ul>
-            <li>
-              Total Comments Analyzed:
-              <strong>{{ sentiment_data.detailed_sentiment|length }}</strong>
-            </li>
-            <li>
-              Average VADER Score:
-              <strong
-                >{{ sentiment_data.avg_vader_score|floatformat:2 }}</strong
-              >
-            </li>
-            <li>
-              DistilBERT Confidence:
-              <strong
-                >{{ sentiment_data.avg_distilbert_score|floatformat:2 }}</strong
-              >
-            </li>
-          </ul>
-        </div>
-
-        <div class="sentiment-distribution">
-          <h4>Sentiment Distribution</h4>
-          <div class="distribution-bar">
-            <div
-              class="positive-bar"
-              style="width: {{ sentiment_data.positive }}%"
-            >
-              Positive ({{ sentiment_data.positive }}%)
-            </div>
-            <div
-              class="neutral-bar"
-              style="width: {{ sentiment_data.neutral }}%"
-            >
-              Neutral ({{ sentiment_data.neutral }}%)
-            </div>
-            <div
-              class="negative-bar"
-              style="width: {{ sentiment_data.negative }}%"
-            >
-              Negative ({{ sentiment_data.negative }}%)
-            </div>
+        {% endif %} {% if sentiment_data.theme_analysis %}
+        <div class="theme-analysis">
+          <h3>Theme Analysis</h3>
+          <div class="themes">
+            <h4>Main Themes</h4>
+            <ul>
+              {% for theme in sentiment_data.theme_analysis.themes %}
+              <li>{{ theme }}</li>
+              {% endfor %}
+            </ul>
+          </div>
+          <div class="explanation">
+            <h4>Sentiment Analysis Explanation</h4>
+            <p>{{ sentiment_data.theme_analysis.explanation }}</p>
           </div>
         </div>
+        {% endif %}
 
-        <div class="comment-analysis">
-          <h4>Comment-by-Comment Analysis</h4>
-          {% for item in sentiment_data.detailed_sentiment %}
-          <div class="comment-card">
-            <div class="comment-text">{{ item.text }}</div>
-            <div class="sentiment-scores">
-              <div class="score-item">
-                <span class="label">VADER Score:</span>
-                <span
-                  class="value {% if item.vader_score > 0.05 %}positive{% elif item.vader_score < -0.05 %}negative{% else %}neutral{% endif %}"
-                >
-                  {{ item.vader_score|floatformat:2 }}
-                </span>
+        <div class="detailed-analysis">
+          <h3>Overall Statistics</h3>
+          <div class="stats">
+            <p>Total Comments Analyzed: {{ sentiment_data.total_comments }}</p>
+            <p>
+              Average VADER Score: {{
+              sentiment_data.avg_vader_score|floatformat:2 }}
+            </p>
+            <p>
+              DistilBERT Confidence: {{
+              sentiment_data.avg_distilbert_score|floatformat:2 }}
+            </p>
+          </div>
+          <div class="sentiment-distribution">
+            <h4>Sentiment Distribution</h4>
+            <div class="distribution-bars">
+              <div
+                class="bar positive"
+                style="width: {{ sentiment_data.positive }}%"
+              >
+                Positive ({{ sentiment_data.positive }}%)
               </div>
-              <div class="score-item">
-                <span class="label">DistilBERT:</span>
-                <span
-                  class="value {% if item.distilbert_label == 'POSITIVE' %}positive{% else %}negative{% endif %}"
-                >
-                  {{ item.distilbert_label }} ({{
-                  item.distilbert_score|floatformat:2 }})
-                </span>
+              <div
+                class="bar neutral"
+                style="width: {{ sentiment_data.neutral }}%"
+              >
+                Neutral ({{ sentiment_data.neutral }}%)
+              </div>
+              <div
+                class="bar negative"
+                style="width: {{ sentiment_data.negative }}%"
+              >
+                Negative ({{ sentiment_data.negative }}%)
               </div>
             </div>
           </div>
-          {% endfor %}
         </div>
       </div>
     </div>
