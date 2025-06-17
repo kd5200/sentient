@@ -3,6 +3,9 @@ import openai
 from django.conf import settings
 import json
 
+# Configure OpenAI client
+openai.api_key = settings.OPENAI_API_KEY
+
 def generate_theme_analysis(
     comments: List[str],
     sentiment_data: Dict[str, Any],
