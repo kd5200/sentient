@@ -62,25 +62,47 @@ def _extract_explanation_from_content(content: str) -> str:
         # Split content into sections
         sections = content.split("###")
         
-        # Look for explanation section
+        # Look for explanation section with more flexible matching
         for section in sections:
-            if "Explanation of Classification" in section:
+            if any(keyword in section for keyword in ["Explanation", "Classification", "Sentiment Analysis"]):
                 # Clean up the explanation text
                 lines = section.split("\n")
                 explanation_lines = []
                 in_explanation = False
                 
                 for line in lines:
-                    if "Explanation of Classification" in line:
+                    line = line.strip()
+                    # Start collecting explanation after finding the header
+                    if any(keyword in line for keyword in ["Explanation", "Classification", "Sentiment Analysis"]):
                         in_explanation = True
                         continue
-                    if in_explanation and line.strip():
+                    # Stop if we hit another section header
+                    elif line.startswith("###") or line.startswith("---"):
+                        break
+                    elif in_explanation and line:
                         # Remove markdown formatting
                         line = line.replace("**", "").replace("*", "").strip()
-                        if line and not line.startswith(("###", "---")):
+                        if line and not line.startswith(("###", "---", "##")):
                             explanation_lines.append(line)
                         
-                return " ".join(explanation_lines)
+                if explanation_lines:
+                    return " ".join(explanation_lines)
+        
+        # If no structured explanation found, try to extract from the end of the content
+        lines = content.split("\n")
+        explanation_lines = []
+        found_explanation = False
+        
+        for line in reversed(lines):  # Start from the end
+            line = line.strip()
+            if any(keyword in line for keyword in ["Explanation", "Classification", "Sentiment Analysis"]):
+                found_explanation = True
+                break
+            elif found_explanation and line:
+                explanation_lines.insert(0, line)
+        
+        if explanation_lines:
+            return " ".join(explanation_lines)
                 
         return "No detailed explanation available"
     except Exception as e:
@@ -199,6 +221,11 @@ def generate_theme_analysis(
         content = _get_response_content(response)
         logger.info(f"Raw response content: {content}")
         
+        # Log the content structure for debugging
+        logger.info(f"Content length: {len(content)}")
+        logger.info(f"Content sections (###): {len(content.split('###'))}")
+        logger.info(f"Content lines: {len(content.split(chr(10)))}")
+        
         # Try to parse the content as JSON first
         try:
             content_dict = json.loads(content)
@@ -216,6 +243,7 @@ def generate_theme_analysis(
         
         logger.info(f"Extracted themes: {themes}")
         logger.info(f"Extracted explanation: {explanation}")
+        logger.info(f"Explanation length: {len(explanation)}")
         
         return {
             "themes": themes if themes else ["No specific themes identified"],
